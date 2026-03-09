@@ -38,7 +38,9 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-camera",
+      "expo-location"
     ],
     "experiments": {
       "typedRoutes": true,
