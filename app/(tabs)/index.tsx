@@ -147,7 +147,6 @@ export default function Gallery() {
       {photos.length === 0 ? (
         // Empty state
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>📷</Text>
           <Text style={styles.emptyTitle}>No photos yet</Text>
           <Text style={styles.emptySubtitle}>Photos you take will appear here</Text>
         </View>
