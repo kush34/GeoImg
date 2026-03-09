@@ -9,6 +9,9 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
+  FlatList,
+  Modal,
+  StatusBar,
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Location from "expo-location";
@@ -20,7 +23,7 @@ import * as MediaLibrary from "expo-media-library";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 // ── Replace with your OpenWeatherMap API key ──────────────────────────────────
-const OWM_API_KEY = "YOUR_OPENWEATHERMAP_API_KEY";
+const OWM_API_KEY = process.env.EXPO_PUBLIC_API_URL;
 
 // ─── OpenWeatherMap fetch ─────────────────────────────────────────────────────
 async function fetchWeather(lat: number, lon: number, altitudeFallback: number): Promise<WeatherData> {
@@ -240,7 +243,9 @@ export default function Explore() {
   // Compositing: raw camera URI staged here before captureRef
   const [rawPhotoUri, setRawPhotoUri] = useState<string | null>(null);
   const composeViewRef = useRef<View | null>(null);
-
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const viewerListRef = useRef<FlatList<string>>(null);
+  const { photos } = useGallery();
   const [permission, requestPermission] = useCameraPermissions();
   const [libraryPermission, requestLibraryPermission] = MediaLibrary.usePermissions();
   const { addPhoto } = useGallery();
@@ -302,7 +307,7 @@ export default function Explore() {
         // High-accuracy GPS fix in background — updates coords when ready
         Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High })
           .then((loc) => setLocation(loc.coords))
-          .catch(() => {}),
+          .catch(() => { }),
       ]);
     })();
   }, []);
@@ -407,11 +412,43 @@ export default function Explore() {
         />
       </View>
 
+      {/* Photo viewer modal */}
+      <Modal visible={viewerOpen} animationType="fade" statusBarTranslucent onRequestClose={() => setViewerOpen(false)}>
+        <StatusBar hidden />
+        <View style={styles.viewerContainer}>
+          <FlatList
+            ref={viewerListRef}
+            data={photos}
+            keyExtractor={(_, i) => i.toString()}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            initialScrollIndex={photos.indexOf(preview ?? "") >= 0 ? photos.indexOf(preview ?? "") : 0}
+            getItemLayout={(_, index) => ({ length: SCREEN_WIDTH, offset: SCREEN_WIDTH * index, index })}
+            renderItem={({ item, index }) => (
+              <View style={styles.viewerSlide}>
+                <Image source={{ uri: item }} style={styles.viewerImage} resizeMode="contain" />
+                <View style={styles.viewerCounter}>
+                  <Text style={styles.viewerCounterText}>{index + 1} / {photos.length}</Text>
+                </View>
+              </View>
+            )}
+          />
+          {/* Back button */}
+          <TouchableOpacity style={styles.viewerBackBtn} onPress={() => setViewerOpen(false)} activeOpacity={0.8}>
+            <Text style={styles.viewerBackText}>‹</Text>
+            <Text style={styles.viewerBackLabel}>Back</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
       {/* Shutter button */}
       <View style={styles.shutterBar}>
-        {/* Last photo preview */}
-        {preview ? (
-          <Image source={{ uri: preview }} style={styles.previewThumb} />
+        {/* Last photo preview — tap to open viewer */}
+        {photos[0] ? (
+          <TouchableOpacity onPress={() => setViewerOpen(true)} activeOpacity={0.8}>
+            <Image source={{ uri: photos[0] }} style={styles.previewThumb} />
+          </TouchableOpacity>
         ) : (
           <View style={styles.previewPlaceholder} />
         )}
@@ -657,5 +694,60 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderWidth: 2,
     borderColor: "#ddd",
+  },
+
+  // ── Photo viewer modal
+  viewerContainer: {
+    flex: 1,
+    backgroundColor: "#000",
+  },
+  viewerSlide: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  viewerImage: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
+  },
+  viewerCounter: {
+    position: "absolute",
+    bottom: 48,
+    alignSelf: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 20,
+  },
+  viewerCounterText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "600",
+    letterSpacing: 1,
+  },
+  viewerBackBtn: {
+    position: "absolute",
+    top: Platform.OS === "ios" ? 54 : 28,
+    left: 18,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.15)",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 2,
+  },
+  viewerBackText: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "300",
+    lineHeight: 22,
+    marginTop: -1,
+  },
+  viewerBackLabel: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
   },
 });
