@@ -1,4 +1,4 @@
-import { WeatherData } from "../types";
+import { WeatherData } from "@/types";
 
 const OWM_API_KEY = process.env.EXPO_PUBLIC_API_URL;
 

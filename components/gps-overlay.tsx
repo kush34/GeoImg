@@ -1,6 +1,6 @@
-import { OverlayProps } from "@/app/types";
-import { formatDateTime } from "@/app/utils/helpers";
-import styles from "@/app/utils/stylesheet";
+import { OverlayProps } from "@/types";
+import { formatDateTime } from "@/utils/helpers";
+import styles from "@/utils/stylesheet";
 
 import { ActivityIndicator, Text, View, StyleSheet } from "react-native";
 import MapView from "react-native-maps";``
@@ -15,8 +15,8 @@ const GPSOverlay: React.FC<OverlayProps> = ({
 }) => {
   const now = new Date();
   const { dateStr, timeStr } = formatDateTime(now);
-  const lat = location.latitude.toFixed(6);
-  const lon = location.longitude.toFixed(6);
+  const lat = location?.latitude.toFixed(6) ?? "...";;
+  const lon = location?.longitude.toFixed(6) ?? "...";;
 
   return (
     <View style={styles.overlayContainer} pointerEvents="none">

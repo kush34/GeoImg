@@ -28,7 +28,37 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         fontSize: 16,
     },
-
+    btn: {
+        backgroundColor: '#FFD700',
+        width: 42,
+        height: 42,
+        borderRadius: 21,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 'auto',  // pushes to right in header row
+    },
+    headerPill: {
+        backgroundColor: "#FFD700",
+        borderRadius: 20,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        minWidth: 28,
+        alignItems: "center",
+    },
+    headerCount: {
+        color: "#000",
+        fontSize: 11,
+        fontWeight: "800",
+    },
+    navBtn: {
+        backgroundColor: "#FFD700",
+        width: 42,
+        height: 42,
+        borderRadius: 21,
+        alignItems: "center",
+        justifyContent: "center",
+        marginLeft: "auto",
+    },
     // ── Hidden compose view (off-screen, used for captureRef)
     composeView: {
         position: "absolute",
@@ -155,7 +185,13 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         letterSpacing: 0.5,
     },
-
+    message: {
+        textAlign: 'center',
+        paddingBottom: 10,
+    },
+    camera: {
+        flex: 1,
+    },
     // GPS Map Camera badge (top-right)
     brandingBadge: {
         position: "absolute",
@@ -187,12 +223,13 @@ const styles = StyleSheet.create({
 
     // ── Shutter bar
     shutterBar: {
+        bottom:20,
+        padding:20,
         height: 100,
-        backgroundColor: "#111",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingHorizontal: 30,
+        paddingHorizontal: 40,
     },
     previewThumb: {
         width: 54,
